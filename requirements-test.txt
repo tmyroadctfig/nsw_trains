@@ -1,5 +1,5 @@
 # Core Home Assistant dependencies
-homeassistant>=2026.10.2
+homeassistant>=2026.10.4
 
 # HTTP client for API calls
 aiohttp
