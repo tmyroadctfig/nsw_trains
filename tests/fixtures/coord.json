@@ -1,0 +1,124 @@
+{
+  "version": "10.6.21.17",
+  "locations": [
+    {
+      "id": "251540",
+      "isGlobalId": true,
+      "name": "undefined, undefined",
+      "type": "stop",
+      "coord": [
+        -34.306457,
+        150.929233
+      ],
+      "parent": {
+        "id": "251540",
+        "name": "undefined, undefined",
+        "type": "locality"
+      },
+      "productClasses": [
+        1,
+        5,
+        11
+      ],
+      "properties": {
+        "distance": 164,
+        "STOP_GLOBAL_ID": "251540",
+        "STOP_NAME_WITH_PLACE": "Austinmer Station, Austinmer",
+        "STOP_MAJOR_MEANS": "2",
+        "STOP_MEANS_LIST": "2,3",
+        "STOP_MOT_LIST": "1,5,11",
+        "stopId": "10101363"
+      },
+      "disassembledName": "undefined, undefined"
+    },
+    {
+      "id": "G251528",
+      "isGlobalId": true,
+      "name": "undefined, undefined",
+      "type": "stop",
+      "coord": [
+        -34.307138,
+        150.931045
+      ],
+      "parent": {
+        "id": "G251528",
+        "name": "undefined, undefined",
+        "type": "locality"
+      },
+      "productClasses": [
+        5,
+        11
+      ],
+      "properties": {
+        "distance": 303,
+        "STOP_GLOBAL_ID": "G251528",
+        "STOP_NAME_WITH_PLACE": "Moore St at Slade St, Austinmer",
+        "STOP_MAJOR_MEANS": "3",
+        "STOP_MEANS_LIST": "3",
+        "STOP_MOT_LIST": "5,11",
+        "stopId": "10128528"
+      },
+      "disassembledName": "undefined, undefined"
+    },
+    {
+      "id": "251530",
+      "isGlobalId": true,
+      "name": "undefined, undefined",
+      "type": "stop",
+      "coord": [
+        -34.289673,
+        150.94316
+      ],
+      "parent": {
+        "id": "251530",
+        "name": "undefined, undefined",
+        "type": "locality"
+      },
+      "productClasses": [
+        1,
+        5,
+        11
+      ],
+      "properties": {
+        "distance": 2100,
+        "STOP_GLOBAL_ID": "251530",
+        "STOP_NAME_WITH_PLACE": "Coledale Station, Coledale",
+        "STOP_MAJOR_MEANS": "2",
+        "STOP_MEANS_LIST": "2,3",
+        "STOP_MOT_LIST": "1,5,11",
+        "stopId": "10101363"
+      },
+      "disassembledName": "undefined, undefined"
+    },
+    {
+      "id": "251550",
+      "isGlobalId": true,
+      "name": "undefined, undefined",
+      "type": "stop",
+      "coord": [
+        -34.318016,
+        150.918912
+      ],
+      "parent": {
+        "id": "251550",
+        "name": "undefined, undefined",
+        "type": "locality"
+      },
+      "productClasses": [
+        1,
+        5,
+        11
+      ],
+      "properties": {
+        "distance": 1600,
+        "STOP_GLOBAL_ID": "251550",
+        "STOP_NAME_WITH_PLACE": "Thirroul Station, Thirroul",
+        "STOP_MAJOR_MEANS": "2",
+        "STOP_MEANS_LIST": "2,3",
+        "STOP_MOT_LIST": "1,5,11",
+        "stopId": "10101363"
+      },
+      "disassembledName": "undefined, undefined"
+    }
+  ]
+}

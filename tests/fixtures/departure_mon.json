@@ -1,0 +1,234 @@
+{
+  "version": "10.2.1.42",
+  "locations": [
+    {
+      "id": "200060",
+      "name": "Central Station, Sydney",
+      "type": "stop",
+      "modes": [
+        1,
+        2,
+        4,
+        5,
+        7,
+        11
+      ]
+    }
+  ],
+  "stopEvents": [
+    {
+      "isRealtimeControlled": true,
+      "location": {
+        "id": "2000336",
+        "name": "Central Station, Platform 18, Sydney",
+        "disassembledName": "Central Station, Platform 18, Sydney",
+        "type": "platform",
+        "properties": {
+          "stopId": "10101100",
+          "platform": "CE18",
+          "platformName": "Platform 18",
+          "plannedPlatformName": "Platform 18"
+        }
+      },
+      "departureTimePlanned": "2026-11-07T03:10:00Z",
+      "departureTimeEstimated": "2026-11-07T03:12:00Z",
+      "transportation": {
+        "id": "nsw:020T8: :H:sj2",
+        "name": "Sydney Trains Network T8 Airport & South Line",
+        "disassembledName": "T8",
+        "number": "T8 Airport & South Line",
+        "product": {
+          "class": 1,
+          "name": "Sydney Trains Network",
+          "iconId": 1
+        },
+        "destination": {
+          "id": "10101420",
+          "name": "Macarthur"
+        }
+      },
+      "infos": [
+        {
+          "priority": "normal",
+          "id": "alert-lift",
+          "type": "stopInfo",
+          "subtitle": "Central Station lift on platform 18 is out of service",
+          "url": "https://transportnsw.info/alerts/details#/lift"
+        }
+      ],
+      "realtimeStatus": [
+        "MONITORED"
+      ]
+    },
+    {
+      "isRealtimeControlled": true,
+      "location": {
+        "id": "2000334",
+        "name": "Central Station, Platform 16, Sydney",
+        "disassembledName": "Central Station, Platform 16, Sydney",
+        "type": "platform",
+        "properties": {
+          "stopId": "10101100",
+          "platform": "CE16",
+          "platformName": "Platform 16",
+          "plannedPlatformName": "Platform 16"
+        }
+      },
+      "departureTimePlanned": "2026-11-07T03:04:00Z",
+      "departureTimeEstimated": "2026-11-07T03:04:00Z",
+      "transportation": {
+        "id": "nsw:020T1: :H:sj2",
+        "name": "Sydney Trains Network T1 North Shore & Western Line",
+        "disassembledName": "T1",
+        "number": "T1 North Shore & Western Line",
+        "product": {
+          "class": 1,
+          "name": "Sydney Trains Network",
+          "iconId": 1
+        },
+        "destination": {
+          "id": "10101329",
+          "name": "Emu Plains"
+        }
+      },
+      "infos": [
+        {
+          "priority": "high",
+          "id": "alert-trackwork",
+          "type": "lineInfo",
+          "subtitle": "Trackwork between Penrith and Emu Plains",
+          "url": "https://transportnsw.info/alerts/details#/trackwork"
+        },
+        {
+          "priority": "normal",
+          "id": "alert-lift",
+          "type": "stopInfo",
+          "subtitle": "Central Station lift on platform 18 is out of service",
+          "url": "https://transportnsw.info/alerts/details#/lift"
+        }
+      ],
+      "realtimeStatus": [
+        "MONITORED"
+      ]
+    },
+    {
+      "isRealtimeControlled": false,
+      "location": {
+        "id": "2000335",
+        "name": "Central Station, Platform 17, Sydney",
+        "disassembledName": "Central Station, Platform 17, Sydney",
+        "type": "platform",
+        "properties": {
+          "stopId": "10101100",
+          "platform": "CE17",
+          "platformName": "Platform 17",
+          "plannedPlatformName": "Platform 17"
+        }
+      },
+      "departureTimePlanned": "2026-11-07T03:20:00Z",
+      "transportation": {
+        "id": "nsw:020T4: :H:sj2",
+        "name": "Sydney Trains Network T4 Eastern Suburbs & Illawarra Line",
+        "disassembledName": "T4",
+        "number": "T4 Eastern Suburbs & Illawarra Line",
+        "product": {
+          "class": 1,
+          "name": "Sydney Trains Network",
+          "iconId": 1
+        },
+        "destination": {
+          "id": "10101100",
+          "name": "Bondi Junction"
+        }
+      }
+    },
+    {
+      "isRealtimeControlled": true,
+      "location": {
+        "id": "2000334",
+        "name": "Central Station, Platform 16, Sydney",
+        "disassembledName": "Central Station, Platform 16, Sydney",
+        "type": "platform",
+        "properties": {
+          "stopId": "10101100",
+          "platform": "CE16",
+          "platformName": "Platform 16",
+          "plannedPlatformName": "Platform 16"
+        }
+      },
+      "departureTimePlanned": "2026-11-07T03:07:00Z",
+      "transportation": {
+        "disassembledName": "T1",
+        "number": "T1 North Shore & Western Line",
+        "product": {
+          "class": 1,
+          "name": "Sydney Trains Network",
+          "iconId": 1
+        },
+        "destination": {
+          "name": "Richmond"
+        }
+      },
+      "realtimeStatus": [
+        "TRIP_CANCELLED"
+      ]
+    },
+    {
+      "isRealtimeControlled": true,
+      "location": {
+        "id": "200081",
+        "name": "Central Station, Platform 26, Sydney",
+        "disassembledName": "Central Station, Platform 26, Sydney",
+        "type": "platform",
+        "properties": {
+          "stopId": "10101100",
+          "platform": "CE26",
+          "platformName": "Platform 26",
+          "plannedPlatformName": "Platform 26"
+        }
+      },
+      "departureTimePlanned": "2026-11-07T03:08:00Z",
+      "departureTimeEstimated": "2026-11-07T03:08:30Z",
+      "transportation": {
+        "disassembledName": "M1",
+        "number": "Metro North West & Bankstown Line",
+        "product": {
+          "class": 2,
+          "name": "Sydney Metro",
+          "iconId": 2
+        },
+        "destination": {
+          "name": "Tallawong"
+        }
+      },
+      "realtimeStatus": [
+        "MONITORED"
+      ]
+    },
+    {
+      "isRealtimeControlled": true,
+      "location": {
+        "id": "200060",
+        "name": "Central Chalmers Street Light Rail",
+        "disassembledName": "Central Chalmers Street Light Rail",
+        "type": "platform"
+      },
+      "departureTimePlanned": "2026-11-07T03:05:00Z",
+      "transportation": {
+        "disassembledName": "L2",
+        "number": "L2 Randwick Line",
+        "product": {
+          "class": 4,
+          "name": "Sydney Light Rail",
+          "iconId": 13
+        },
+        "destination": {
+          "name": "Randwick"
+        }
+      },
+      "realtimeStatus": [
+        "MONITORED"
+      ]
+    }
+  ]
+}

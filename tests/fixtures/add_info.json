@@ -1,0 +1,72 @@
+{
+  "version": "10.2.1.42",
+  "timestamp": "2026-11-07T03:00:00Z",
+  "infos": {
+    "current": [
+      {
+        "id": "sco-trackwork-now",
+        "version": 1,
+        "type": "lineInfo",
+        "priority": "normal",
+        "subtitle": "Some trains run to a changed timetable. Trains do not stop at Wolli Creek",
+        "url": "https://transportnsw.info/alerts/details#/sco-trackwork-now",
+        "properties": {"announcementType": "trackwork", "smsText": "Trains do not stop at Wolli Creek"},
+        "timestamps": {"validity": [{"from": "2026-11-06T19:30:00Z", "to": "2026-11-07T05:00:00Z"}]},
+        "affected": {
+          "lines": [
+            {"id": "nsw:02SCO: :H:", "number": "South Coast Line"},
+            {"id": "nsw:02SCO: :R:", "number": "South Coast Line"},
+            {"id": "nsw:020T4: :H:", "number": "T4 Eastern Suburbs & Illawarra Line"}
+          ],
+          "stops": []
+        }
+      },
+      {
+        "id": "sco-trackwork-later",
+        "version": 1,
+        "type": "lineInfo",
+        "priority": "normal",
+        "subtitle": "Buses replace trains between Dapto, Port Kembla and Central",
+        "url": "https://transportnsw.info/alerts/details#/sco-trackwork-later",
+        "properties": {"announcementType": "trackwork"},
+        "timestamps": {
+          "validity": [
+            {"from": "2026-11-20T15:00:00Z", "to": "2026-11-22T15:00:00Z"},
+            {"from": "2026-11-27T15:00:00Z", "to": "2026-11-29T15:00:00Z"}
+          ]
+        },
+        "affected": {"lines": [{"id": "nsw:76SCO: :H:", "number": "South Coast Line"}], "stops": []}
+      },
+      {
+        "id": "sco-standing",
+        "version": 1,
+        "type": "stopInfo",
+        "priority": "veryLow",
+        "subtitle": "Platforms may change. Check indicator screens and listen for announcements",
+        "url": "https://transportnsw.info/alerts/details#/sco-standing",
+        "properties": {"announcementType": "serviceChange"},
+        "timestamps": {"validity": [{"from": "2021-11-19T03:00:00Z", "isOpenEnd": true, "to": "2500-12-31T00:00:00Z"}]},
+        "affected": {"lines": [{"id": "nsw:02SCO: :H:", "number": "South Coast Line"}], "stops": []}
+      },
+      {
+        "id": "t1-incident",
+        "version": 1,
+        "type": "lineInfo",
+        "priority": "high",
+        "subtitle": "Allow extra travel time due to a signal repair at Strathfield",
+        "url": "https://transportnsw.info/alerts/details#/t1-incident",
+        "properties": {"announcementType": "serviceChange"},
+        "timestamps": {"validity": [{"from": "2026-11-07T02:00:00Z", "to": "2026-11-07T06:00:00Z"}]},
+        "affected": {"lines": [{"id": "nsw:020T1:W:H:", "number": "T1 North Shore & Western Line"}], "stops": []}
+      },
+      {
+        "id": "station-only",
+        "type": "stopInfo",
+        "priority": "normal",
+        "subtitle": "Lift out of service",
+        "timestamps": {"validity": [{"from": "2026-11-01T00:00:00Z", "to": "2026-12-01T00:00:00Z"}]},
+        "affected": {"lines": [], "stops": [{"id": "200060"}]}
+      }
+    ]
+  }
+}

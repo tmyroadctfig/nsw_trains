@@ -1,0 +1,108 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NSW Trains",
+        "description": "What would you like to add?",
+        "menu_options": {
+          "station_search": "Departures from a station",
+          "line": "Line status",
+          "home": "Trains passing home"
+        }
+      },
+      "station_search": {
+        "title": "Find a station",
+        "description": "Get a free API key from the [Transport for NSW Open Data Hub](https://opendata.transport.nsw.gov.au/), with access to the Trip Planner and Realtime APIs.",
+        "data": {
+          "api_key": "API key",
+          "search": "Station name"
+        }
+      },
+      "station": {
+        "title": "Choose a station",
+        "data": {
+          "stop_id": "Station"
+        }
+      },
+      "line": {
+        "title": "Line status",
+        "description": "On-time running, delays, alerts and trackwork for a line. Get a free API key from the [Transport for NSW Open Data Hub](https://opendata.transport.nsw.gov.au/).",
+        "data": {
+          "api_key": "API key",
+          "line": "Line"
+        }
+      },
+      "home": {
+        "title": "Trains passing home",
+        "description": "Predicts when trains pass a point on the line, and tracks the nearest train by GPS. Defaults to your Home Assistant home location.",
+        "data": {
+          "api_key": "API key",
+          "latitude": "Latitude",
+          "longitude": "Longitude"
+        }
+      },
+      "home_stations": {
+        "title": "Stations either side",
+        "description": "Choose the stations on either side of the location, so that trains stopping at both pass it. The two nearest are suggested.",
+        "data": {
+          "station_a": "Station",
+          "station_b": "Other station"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Update API key",
+        "description": "Transport for NSW rejected the API key. Enter a new one.",
+        "data": {
+          "api_key": "API key"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "The API key was rejected",
+      "cannot_connect": "Could not reach the Transport for NSW API",
+      "no_stations": "No train or metro stations match that name",
+      "no_nearby_stations": "Fewer than two train stations within 8 km of that location",
+      "same_station": "Choose two different stations"
+    },
+    "abort": {
+      "already_configured": "This is already configured",
+      "reauth_successful": "API key updated"
+    }
+  },
+  "options": {
+    "step": {
+      "station": {
+        "title": "Departures",
+        "data": {
+          "departure_count": "Number of departure sensors",
+          "include_metro": "Include Sydney Metro services",
+          "platform": "Only show departures from platform"
+        },
+        "data_description": {
+          "platform": "Platform number, e.g. 16. Leave blank for all platforms."
+        }
+      },
+      "home": {
+        "title": "Trains passing",
+        "data": {
+          "passing_radius": "GPS passing distance (m)"
+        },
+        "data_description": {
+          "passing_radius": "Turn on 'Train passing' when a train's live GPS position is this close. Predicted pass times also turn it on."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "line_status": {
+        "state": {
+          "good_service": "Good service",
+          "trackwork": "Trackwork",
+          "delays": "Delays",
+          "disruption": "Disruption"
+        }
+      }
+    }
+  }
+}

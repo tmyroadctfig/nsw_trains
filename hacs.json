@@ -1,0 +1,6 @@
+{
+  "name": "NSW Trains",
+  "country": "AU",
+  "render_readme": true,
+  "homeassistant": "2026.7.0"
+}

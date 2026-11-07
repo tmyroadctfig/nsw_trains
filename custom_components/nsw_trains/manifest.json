@@ -1,0 +1,17 @@
+{
+  "domain": "nsw_trains",
+  "name": "NSW Trains",
+  "codeowners": [
+    "@tmyroadctfig"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/tmyroadctfig/nsw_trains",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/tmyroadctfig/nsw_trains/issues",
+  "requirements": [
+    "gtfs-realtime-bindings==3.0.0"
+  ],
+  "version": "0.2.0"
+}

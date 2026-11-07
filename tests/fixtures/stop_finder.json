@@ -1,0 +1,55 @@
+{
+  "version": "10.2.1.42",
+  "locations": [
+    {
+      "id": "200060",
+      "name": "Central Station, Sydney",
+      "disassembledName": "Central Station",
+      "type": "stop",
+      "matchQuality": 1000,
+      "isBest": true,
+      "modes": [
+        1,
+        2,
+        4,
+        5,
+        7,
+        11
+      ]
+    },
+    {
+      "id": "2000449",
+      "name": "Central Chalmers Street Light Rail, Haymarket",
+      "type": "stop",
+      "matchQuality": 990,
+      "modes": [
+        4
+      ]
+    },
+    {
+      "id": "10112022",
+      "name": "Central Coast Hwy, Erina",
+      "type": "street",
+      "matchQuality": 900
+    },
+    {
+      "id": "2153401",
+      "name": "Gosford Station, Gosford",
+      "type": "stop",
+      "matchQuality": 700,
+      "modes": [
+        1,
+        5
+      ]
+    },
+    {
+      "id": "209110",
+      "name": "Central Station Metro, Sydney",
+      "type": "stop",
+      "matchQuality": 980,
+      "modes": [
+        2
+      ]
+    }
+  ]
+}
