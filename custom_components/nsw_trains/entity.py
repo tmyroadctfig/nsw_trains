@@ -1,13 +1,13 @@
 """Base entity and device info shared by the sensor platforms."""
 
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
 from .const import ATTRIBUTION, DOMAIN, MODEL_NAME, SHORT_ATTRIBUTION
 
-CoordinatorT = TypeVar("CoordinatorT", bound=DataUpdateCoordinator)
+CoordinatorT = TypeVar("CoordinatorT", bound=DataUpdateCoordinator[Any])
 
 
 def _device_info(identifier: str, name: str, model: str) -> DeviceInfo:

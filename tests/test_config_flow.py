@@ -416,3 +416,13 @@ async def test_setup_entry_uses_coordinator_for_type(entry_type):
 
     assert entry.runtime_data is coordinator_cls.return_value
     hass.config_entries.async_forward_entry_setups.assert_awaited_once_with(entry, ["sensor", "binary_sensor"])
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("step", ["async_step_station_search", "async_step_line"])
+async def test_forms_link_to_open_data_hub(step):
+    flow, _, _ = make_flow()
+
+    result = await getattr(flow, step)()
+
+    assert result["description_placeholders"] == {"docs_url": "https://opendata.transport.nsw.gov.au/"}

@@ -45,6 +45,9 @@ API_KEY_CHECK_QUERY = "Central"
 
 HOME_TITLE = "Home"
 
+# Passed to the form text as a placeholder: hassfest doesn't allow URLs in strings.json
+DESCRIPTION_PLACEHOLDERS = {"docs_url": "https://opendata.transport.nsw.gov.au/"}
+
 
 class NswTrainsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -104,7 +107,9 @@ class NswTrainsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         schema = vol.Schema(
             {**self._api_key_field(defaults), vol.Required(CONF_SEARCH, default=defaults.get(CONF_SEARCH, "")): str}
         )
-        return self.async_show_form(step_id="station_search", data_schema=schema, errors=errors)
+        return self.async_show_form(
+            step_id="station_search", data_schema=schema, errors=errors, description_placeholders=DESCRIPTION_PLACEHOLDERS
+        )
 
     async def async_step_station(self, user_input: dict[str, Any] | None = None) -> Any:
         """Pick one of the stations matching the search."""
@@ -151,7 +156,9 @@ class NswTrainsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         schema = vol.Schema(
             {**self._api_key_field(defaults), vol.Required(CONF_LINE, default=defaults.get(CONF_LINE, "T1")): vol.In(LINES)}
         )
-        return self.async_show_form(step_id="line", data_schema=schema, errors=errors)
+        return self.async_show_form(
+            step_id="line", data_schema=schema, errors=errors, description_placeholders=DESCRIPTION_PLACEHOLDERS
+        )
 
     # --- Trains passing home ---
 

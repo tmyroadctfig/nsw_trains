@@ -12,7 +12,7 @@
       },
       "station_search": {
         "title": "Find a station",
-        "description": "Get a free API key from the [Transport for NSW Open Data Hub](https://opendata.transport.nsw.gov.au/), with access to the Trip Planner and Realtime APIs.",
+        "description": "Get a free API key from the [Transport for NSW Open Data Hub]({docs_url}), with access to the Trip Planner and Realtime APIs.",
         "data": {
           "api_key": "API key",
           "search": "Station name"
@@ -26,7 +26,7 @@
       },
       "line": {
         "title": "Line status",
-        "description": "On-time running, delays, alerts and trackwork for a line. Get a free API key from the [Transport for NSW Open Data Hub](https://opendata.transport.nsw.gov.au/).",
+        "description": "On-time running, delays, alerts and trackwork for a line. Get a free API key from the [Transport for NSW Open Data Hub]({docs_url}).",
         "data": {
           "api_key": "API key",
           "line": "Line"

@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Any
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -199,7 +199,7 @@ class OnTimeSensor(NswTrainsEntity[LineCoordinator], SensorEntity):
     """Share of trains running now that are on time, with the late ones as attributes."""
 
     _attr_native_unit_of_measurement = "%"
-    _attr_state_class = "measurement"
+    _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_icon = "mdi:clock-check-outline"
 
     def __init__(self, coordinator: LineCoordinator, line: str, line_name: str) -> None:
@@ -318,7 +318,7 @@ class NearestTrainSensor(NswTrainsEntity[HomeCoordinator], SensorEntity):
 
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_native_unit_of_measurement = "m"
-    _attr_state_class = "measurement"
+    _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_icon = "mdi:map-marker-distance"
     _unrecorded_attributes = frozenset({"latitude", "longitude", "position_age_seconds"})
 

@@ -62,8 +62,14 @@ class _StubFlow:
     def async_create_entry(self, title="", data=None):
         return {"type": "create_entry", "title": title, "data": data or {}}
 
-    def async_show_form(self, step_id, data_schema=None, errors=None):
-        return {"type": "form", "step_id": step_id, "data_schema": data_schema, "errors": errors or {}}
+    def async_show_form(self, step_id, data_schema=None, errors=None, description_placeholders=None):
+        return {
+            "type": "form",
+            "step_id": step_id,
+            "data_schema": data_schema,
+            "errors": errors or {},
+            "description_placeholders": description_placeholders,
+        }
 
     def async_abort(self, reason):
         return {"type": "abort", "reason": reason}
@@ -162,47 +168,41 @@ class _ConfigEntryAuthFailed(Exception):
     pass
 
 
-# Provide a lightweight homeassistant stub when the full package is unavailable.
-# In CI the real package is installed; this fallback enables local development
-# without the heavy HA dependency tree.
-try:
-    import homeassistant  # noqa: F401
+# Unit tests always run against this lightweight homeassistant stub, whether or not the real package is
+# installed (CI installs it for type checking). Driving HA's real config flow machinery needs a running hass
+# (frame helper, flow manager context), so mixing the two made results depend on the environment.
+_ha = MagicMock()
+_ha.core.callback = lambda f: f
 
-    HA_STUBBED = False
-except ImportError:
-    HA_STUBBED = True
-    _ha = MagicMock()
-    _ha.core.callback = lambda f: f
+_ha.config_entries.ConfigFlow = _StubConfigFlow
+_ha.config_entries.OptionsFlow = _StubOptionsFlow
+_ha.data_entry_flow.AbortFlow = _AbortFlow
+_ha.components.sensor.SensorEntity = _StubSensorEntity
+_ha.components.sensor.SensorDeviceClass.TIMESTAMP = "timestamp"
+_ha.components.sensor.SensorDeviceClass.ENUM = "enum"
+_ha.components.sensor.SensorDeviceClass.DISTANCE = "distance"
+_ha.components.binary_sensor.BinarySensorEntity = _StubBinarySensorEntity
+_ha.helpers.update_coordinator.DataUpdateCoordinator = _StubCoordinator
+_ha.helpers.update_coordinator.CoordinatorEntity = _StubCoordinatorEntity
+_ha.helpers.update_coordinator.UpdateFailed = _UpdateFailed
+_ha.exceptions.ConfigEntryAuthFailed = _ConfigEntryAuthFailed
+_ha.helpers.device_registry.DeviceInfo = dict
 
-    _ha.config_entries.ConfigFlow = _StubConfigFlow
-    _ha.config_entries.OptionsFlow = _StubOptionsFlow
-    _ha.data_entry_flow.AbortFlow = _AbortFlow
-    _ha.components.sensor.SensorEntity = _StubSensorEntity
-    _ha.components.sensor.SensorDeviceClass.TIMESTAMP = "timestamp"
-    _ha.components.sensor.SensorDeviceClass.ENUM = "enum"
-    _ha.components.sensor.SensorDeviceClass.DISTANCE = "distance"
-    _ha.components.binary_sensor.BinarySensorEntity = _StubBinarySensorEntity
-    _ha.helpers.update_coordinator.DataUpdateCoordinator = _StubCoordinator
-    _ha.helpers.update_coordinator.CoordinatorEntity = _StubCoordinatorEntity
-    _ha.helpers.update_coordinator.UpdateFailed = _UpdateFailed
-    _ha.exceptions.ConfigEntryAuthFailed = _ConfigEntryAuthFailed
-    _ha.helpers.device_registry.DeviceInfo = dict
-
-    _ha_modules = {
-        "homeassistant": _ha,
-        "homeassistant.config_entries": _ha.config_entries,
-        "homeassistant.core": _ha.core,
-        "homeassistant.data_entry_flow": _ha.data_entry_flow,
-        "homeassistant.exceptions": _ha.exceptions,
-        "homeassistant.const": _ha.const,
-        "homeassistant.helpers": _ha.helpers,
-        "homeassistant.helpers.aiohttp_client": _ha.helpers.aiohttp_client,
-        "homeassistant.helpers.device_registry": _ha.helpers.device_registry,
-        "homeassistant.helpers.entity_platform": _ha.helpers.entity_platform,
-        "homeassistant.helpers.update_coordinator": _ha.helpers.update_coordinator,
-        "homeassistant.components": _ha.components,
-        "homeassistant.components.sensor": _ha.components.sensor,
-        "homeassistant.components.binary_sensor": _ha.components.binary_sensor,
-        "homeassistant.helpers.event": _ha.helpers.event,
-    }
-    sys.modules.update(_ha_modules)
+_ha_modules = {
+    "homeassistant": _ha,
+    "homeassistant.config_entries": _ha.config_entries,
+    "homeassistant.core": _ha.core,
+    "homeassistant.data_entry_flow": _ha.data_entry_flow,
+    "homeassistant.exceptions": _ha.exceptions,
+    "homeassistant.const": _ha.const,
+    "homeassistant.helpers": _ha.helpers,
+    "homeassistant.helpers.aiohttp_client": _ha.helpers.aiohttp_client,
+    "homeassistant.helpers.device_registry": _ha.helpers.device_registry,
+    "homeassistant.helpers.entity_platform": _ha.helpers.entity_platform,
+    "homeassistant.helpers.update_coordinator": _ha.helpers.update_coordinator,
+    "homeassistant.components": _ha.components,
+    "homeassistant.components.sensor": _ha.components.sensor,
+    "homeassistant.components.binary_sensor": _ha.components.binary_sensor,
+    "homeassistant.helpers.event": _ha.helpers.event,
+}
+sys.modules.update(_ha_modules)

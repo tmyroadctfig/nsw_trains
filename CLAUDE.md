@@ -8,7 +8,7 @@ This is a Home Assistant custom integration (HACS-compatible) that polls Transpo
 
 ## Commands
 
-A local venv lives in `.venv` (Python 3.12; HA itself is not installed, see the conftest shim below).
+A local venv lives in `.venv` (Python 3.12, no HA). `.venv-ha` (Python 3.14, like CI) has the real `homeassistant` from `requirements-test.txt`, for mypy against real HA types and checking HA behaviour.
 
 ```bash
 # Run unit tests (no network required)
@@ -60,7 +60,11 @@ Response quirks, verified against the live API: `stop_finder` lists a stop's pro
 
 ### conftest.py shim
 
-`tests/conftest.py` injects a stub `homeassistant` package when the real one isn't installed, with minimal stand-ins for `ConfigFlow`/`OptionsFlow` (including `async_show_menu`), `DataUpdateCoordinator`/`CoordinatorEntity`, `SensorEntity`, `BinarySensorEntity`, `UpdateFailed`, `ConfigEntryAuthFailed` and `AbortFlow`. It also loads the gitignored `.env`. Stub entities don't implement HA's `name`/`unique_id` properties, so tests assert on `_attr_*`. If a test fails because a newly imported HA symbol is missing from the stub, add it there. API response fixtures live in `tests/fixtures/`; GTFS-realtime feeds are built in code with `tests/helpers.py` (`vehicle_feed`, `trip_update_feed`).
+`tests/conftest.py` always injects a stub `homeassistant` package, even when the real one is installed (CI installs it for mypy). Driving HA's real config flow machinery needs a running hass (frame helper, flow manager context), so unit tests use minimal stand-ins for `ConfigFlow`/`OptionsFlow` (including `async_show_menu`), `DataUpdateCoordinator`/`CoordinatorEntity`, `SensorEntity`, `BinarySensorEntity`, `UpdateFailed`, `ConfigEntryAuthFailed` and `AbortFlow`. It also loads the gitignored `.env`. Stub entities don't implement HA's `name`/`unique_id` properties, so tests assert on `_attr_*`. If a test fails because a newly imported HA symbol is missing from the stub, add it there. Real-HA flow tests would need `pytest-homeassistant-custom-component`. API response fixtures live in `tests/fixtures/`; GTFS-realtime feeds are built in code with `tests/helpers.py` (`vehicle_feed`, `trip_update_feed`).
+
+### HA 2026.11 schemas
+
+HA 2026.11 replaced voluptuous with probatio and installs it under the `voluptuous` name when `homeassistant` is imported, so `import voluptuous as vol` in the integration gets probatio at runtime (forms serialise and invalid input becomes a form error; verified in `.venv-ha`). mypy still sees the real voluptuous package and reports `data_schema` type errors (expected `probatio.schema.Schema`); those are typing-only.
 
 ## Code Style
 
