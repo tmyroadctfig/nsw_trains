@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+# The default GITHUB_TOKEN is read-only; creating a release needs write access to contents
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
