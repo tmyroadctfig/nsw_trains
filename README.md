@@ -255,7 +255,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 [releases-shield]: https://img.shields.io/github/release/tmyroadctfig/nsw_trains.svg?style=for-the-badge
 [commits-shield]: https://img.shields.io/github/commit-activity/y/tmyroadctfig/nsw_trains.svg?style=for-the-badge
-[license-shield]: https://img.shields.io/github/license/tmyroadctfig/nsw_trains.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/tmyroadctfig/nsw_trains.svg?style=for-the-badge&cacheSeconds=3600
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
 
 [releases]: https://github.com/tmyroadctfig/nsw_trains/releases
