@@ -7,7 +7,7 @@ import pytest
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
-from custom_components.nsw_trains.api import Departure, InvalidApiKey, TransportNswError
+from custom_components.nsw_trains.api import Departure, InvalidApiKey, RateLimited, TransportNswError
 from custom_components.nsw_trains.const import (
     CONF_INCLUDE_METRO,
     CONF_LATITUDE,
@@ -18,7 +18,14 @@ from custom_components.nsw_trains.const import (
     CONF_STATION_B,
     CONF_STOP_ID,
 )
-from custom_components.nsw_trains.coordinator import HomeCoordinator, LineCoordinator, NswTrainsCoordinator, filter_platform
+from custom_components.nsw_trains.coordinator import (
+    AUTH_FAILURES_BEFORE_REAUTH,
+    RATE_LIMIT_BACKOFF,
+    HomeCoordinator,
+    LineCoordinator,
+    NswTrainsCoordinator,
+    filter_platform,
+)
 from custom_components.nsw_trains.feeds import FeedCache
 from custom_components.nsw_trains.gtfs import TripDelay, VehiclePosition
 
@@ -70,6 +77,52 @@ async def test_rejected_api_key_starts_reauth():
 
     with pytest.raises(ConfigEntryAuthFailed):
         await coordinator._async_update_data()
+
+
+@pytest.mark.unit
+async def test_rejected_key_after_working_retries_before_reauth():
+    """TfNSW sometimes rejects a good key for a request or two; only a key that keeps failing needs reauth."""
+    coordinator, client = make_coordinator()
+    await coordinator._async_update_data()
+    client.async_get_departures.side_effect = InvalidApiKey("nope")
+
+    for _ in range(AUTH_FAILURES_BEFORE_REAUTH - 1):
+        with pytest.raises(UpdateFailed):
+            await coordinator._async_update_data()
+    with pytest.raises(ConfigEntryAuthFailed):
+        await coordinator._async_update_data()
+
+
+@pytest.mark.unit
+async def test_success_resets_rejected_key_count():
+    coordinator, client = make_coordinator()
+    await coordinator._async_update_data()
+
+    for _ in range(3):
+        client.async_get_departures.side_effect = InvalidApiKey("nope")
+        for _ in range(AUTH_FAILURES_BEFORE_REAUTH - 1):
+            with pytest.raises(UpdateFailed):
+                await coordinator._async_update_data()
+        client.async_get_departures.side_effect = None
+        await coordinator._async_update_data()
+
+
+@pytest.mark.unit
+async def test_rate_limit_backs_off_without_reauth():
+    coordinator, _ = make_coordinator(error=RateLimited("slow down"))
+
+    with pytest.raises(UpdateFailed) as err:
+        await coordinator._async_update_data()
+    assert err.value.retry_after == RATE_LIMIT_BACKOFF.total_seconds()
+
+
+@pytest.mark.unit
+async def test_rate_limit_uses_server_retry_after_when_longer():
+    coordinator, _ = make_coordinator(error=RateLimited("slow down", retry_after=600))
+
+    with pytest.raises(UpdateFailed) as err:
+        await coordinator._async_update_data()
+    assert err.value.retry_after == 600
 
 
 @pytest.mark.unit

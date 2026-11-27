@@ -10,6 +10,7 @@ from custom_components.nsw_trains.api import (
     STOP_FINDER_ENDPOINT,
     Departure,
     InvalidApiKey,
+    RateLimited,
     TransportNswClient,
     TransportNswError,
     parse_departures,
@@ -217,6 +218,50 @@ async def test_rejected_api_key(status):
     client = TransportNswClient(FakeSession(FakeResponse(status, {})), "bad")
     with pytest.raises(InvalidApiKey):
         await client.async_get_departures("200060")
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("detail", ["Account Over Rate Limit", "Account Over Quota Limit"])
+async def test_rate_limit_403_is_not_a_rejected_key(detail):
+    """TfNSW answers both throttling and the daily quota with 403, told apart from a bad key by X-Error-Detail."""
+    client = TransportNswClient(FakeSession(FakeResponse(403, {}, {"X-Error-Detail": detail})), "secret")
+    with pytest.raises(RateLimited) as err:
+        await client.async_get_departures("200060")
+    assert not isinstance(err.value, InvalidApiKey)
+
+
+@pytest.mark.unit
+async def test_429_is_rate_limited_and_honours_retry_after():
+    client = TransportNswClient(FakeSession(FakeResponse(429, {}, {"Retry-After": "90"})), "secret")
+    with pytest.raises(RateLimited) as err:
+        await client.async_get_vehicle_positions()
+    assert err.value.retry_after == 90
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("retry_after", [None, "soon", "-5"])
+async def test_rate_limited_without_usable_retry_after(retry_after):
+    headers = {"Retry-After": retry_after} if retry_after else {}
+    client = TransportNswClient(FakeSession(FakeResponse(429, {}, headers)), "secret")
+    with pytest.raises(RateLimited) as err:
+        await client.async_get_departures("200060")
+    assert err.value.retry_after is None
+
+
+@pytest.mark.unit
+async def test_503_quota_message_is_rate_limited():
+    body = "Your API quota or rate limit has been exceeded."
+    client = TransportNswClient(FakeSession(FakeResponse(503, body)), "secret")
+    with pytest.raises(RateLimited):
+        await client.async_get_departures("200060")
+
+
+@pytest.mark.unit
+async def test_other_503_is_a_plain_error():
+    client = TransportNswClient(FakeSession(FakeResponse(503, "Service Unavailable")), "secret")
+    with pytest.raises(TransportNswError) as err:
+        await client.async_get_departures("200060")
+    assert not isinstance(err.value, RateLimited)
 
 
 @pytest.mark.unit

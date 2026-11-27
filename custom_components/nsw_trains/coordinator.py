@@ -1,7 +1,6 @@
 """Coordinators poll the API for one config entry and share the result with that entry's entities."""
 
 import logging
-from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, TypeVar
@@ -11,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import Departure, InvalidApiKey, Stop, TransportNswClient, TransportNswError
+from .api import Departure, InvalidApiKey, RateLimited, Stop, TransportNswClient, TransportNswError
 from .const import (
     ALERTS_MAX_AGE,
     CONF_INCLUDE_METRO,
@@ -45,14 +44,39 @@ DEPARTURES_MAX_AGE = timedelta(seconds=60)
 DEPARTURES_LOOKBACK = timedelta(minutes=15)
 
 
-async def _call_api(fetch: Callable[[], Awaitable[T]]) -> T:
-    """Map API errors onto what the coordinator expects: reauth for a bad key, a failed update otherwise."""
-    try:
-        return await fetch()
-    except InvalidApiKey as err:
-        raise ConfigEntryAuthFailed(str(err)) from err
-    except TransportNswError as err:
-        raise UpdateFailed(str(err)) from err
+# TfNSW occasionally rejects a good key for a request or two (seen on the GTFS-realtime feeds), so a key that has
+# worked must be rejected this many updates in a row before asking the user for a new one.
+AUTH_FAILURES_BEFORE_REAUTH = 3
+# How long to wait after hitting the rate limit or quota, unless the API asks for longer.
+RATE_LIMIT_BACKOFF = timedelta(minutes=2)
+
+
+class _ApiCoordinator(DataUpdateCoordinator[T]):
+    """Maps API errors onto what the coordinator expects; subclasses implement _async_fetch."""
+
+    _auth_failures = 0
+    _has_succeeded = False
+
+    async def _async_fetch(self) -> T:
+        raise NotImplementedError
+
+    async def _async_update_data(self) -> T:
+        try:
+            data = await self._async_fetch()
+        except InvalidApiKey as err:
+            self._auth_failures += 1
+            # A key that has never worked here (setup, or a key changed in reauth) is reported straight away
+            if not self._has_succeeded or self._auth_failures >= AUTH_FAILURES_BEFORE_REAUTH:
+                raise ConfigEntryAuthFailed(str(err)) from err
+            raise UpdateFailed(f"{err}; retrying ({self._auth_failures} of {AUTH_FAILURES_BEFORE_REAUTH})") from err
+        except RateLimited as err:
+            retry_after = max(err.retry_after or 0, RATE_LIMIT_BACKOFF.total_seconds())
+            raise UpdateFailed(f"{err}; retrying in {retry_after:.0f}s", retry_after=retry_after) from err
+        except TransportNswError as err:
+            raise UpdateFailed(str(err)) from err
+        self._auth_failures = 0
+        self._has_succeeded = True
+        return data
 
 
 def filter_platform(departures: list[Departure], platform: str | None) -> list[Departure]:
@@ -71,7 +95,7 @@ def stop_to_data(stop: Stop) -> dict[str, Any]:
     return {"id": stop.id, "name": stop.name, "latitude": stop.latitude, "longitude": stop.longitude}
 
 
-class NswTrainsCoordinator(DataUpdateCoordinator[list[Departure]]):
+class NswTrainsCoordinator(_ApiCoordinator[list[Departure]]):
     """Departures from one station."""
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry, client: TransportNswClient) -> None:
@@ -81,12 +105,12 @@ class NswTrainsCoordinator(DataUpdateCoordinator[list[Departure]]):
         self.include_metro: bool = entry.options.get(CONF_INCLUDE_METRO, DEFAULT_INCLUDE_METRO)
         self.platform: str | None = entry.options.get(CONF_PLATFORM) or None
 
-    async def _async_update_data(self) -> list[Departure]:
-        departures = await _call_api(lambda: self.client.async_get_departures(self.stop_id, include_metro=self.include_metro))
+    async def _async_fetch(self) -> list[Departure]:
+        departures = await self.client.async_get_departures(self.stop_id, include_metro=self.include_metro)
         return filter_platform(departures, self.platform)
 
 
-class LineCoordinator(DataUpdateCoordinator[LineStatus]):
+class LineCoordinator(_ApiCoordinator[LineStatus]):
     """Status of one line, from network-wide alerts, train positions and delays shared with other entries."""
 
     def __init__(
@@ -97,11 +121,11 @@ class LineCoordinator(DataUpdateCoordinator[LineStatus]):
         self.line: str = entry.data[CONF_LINE]
         self._cache = cache or get_feed_cache(hass)
 
-    async def _async_update_data(self) -> LineStatus:
+    async def _async_fetch(self) -> LineStatus:
         cache, client = self._cache, self.client
-        alerts = await _call_api(lambda: cache.async_get("alerts", ALERTS_MAX_AGE, client.async_get_line_alerts))
-        vehicles = await _call_api(lambda: cache.async_get("vehicles", REALTIME_MAX_AGE, client.async_get_vehicle_positions))
-        delays = await _call_api(lambda: cache.async_get("delays", REALTIME_MAX_AGE, client.async_get_trip_delays))
+        alerts = await cache.async_get("alerts", ALERTS_MAX_AGE, client.async_get_line_alerts)
+        vehicles = await cache.async_get("vehicles", REALTIME_MAX_AGE, client.async_get_vehicle_positions)
+        delays = await cache.async_get("delays", REALTIME_MAX_AGE, client.async_get_trip_delays)
         return compute_line_status(self.line, alerts, vehicles, delays, datetime.now(timezone.utc))
 
 
@@ -111,7 +135,7 @@ class HomeData:
     nearest: NearbyTrain | None = None
 
 
-class HomeCoordinator(DataUpdateCoordinator[HomeData]):
+class HomeCoordinator(_ApiCoordinator[HomeData]):
     """Trains passing a point on the line, predicted from the stations either side and tracked by GPS."""
 
     def __init__(
@@ -133,22 +157,20 @@ class HomeCoordinator(DataUpdateCoordinator[HomeData]):
         )
 
     async def _departures(self, stop: Stop) -> list[Departure]:
-        return await _call_api(
-            lambda: self._cache.async_get(
-                f"departures:{stop.id}",
-                DEPARTURES_MAX_AGE,
-                lambda: self.client.async_get_departures(
-                    stop.id, include_metro=False, now=datetime.now(timezone.utc) - DEPARTURES_LOOKBACK
-                ),
-            )
+        return await self._cache.async_get(
+            f"departures:{stop.id}",
+            DEPARTURES_MAX_AGE,
+            lambda: self.client.async_get_departures(
+                stop.id, include_metro=False, now=datetime.now(timezone.utc) - DEPARTURES_LOOKBACK
+            ),
         )
 
-    async def _async_update_data(self) -> HomeData:
+    async def _async_fetch(self) -> HomeData:
         now = datetime.now(timezone.utc)
         departures_a = await self._departures(self.station_a)
         departures_b = await self._departures(self.station_b)
         cache, client = self._cache, self.client
-        vehicles = await _call_api(lambda: cache.async_get("vehicles", REALTIME_MAX_AGE, client.async_get_vehicle_positions))
+        vehicles = await cache.async_get("vehicles", REALTIME_MAX_AGE, client.async_get_vehicle_positions)
 
         # Keep recent passes too, so "passing now" still works just after the predicted time
         passes = predict_passes(

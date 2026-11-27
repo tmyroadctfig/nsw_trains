@@ -161,7 +161,9 @@ class _StubBinarySensorEntity:
 
 
 class _UpdateFailed(Exception):
-    pass
+    def __init__(self, *args, retry_after=None):
+        super().__init__(*args)
+        self.retry_after = retry_after
 
 
 class _ConfigEntryAuthFailed(Exception):

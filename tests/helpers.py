@@ -4,15 +4,19 @@ from typing import Any
 
 
 class FakeResponse:
-    def __init__(self, status: int = 200, body: Any = None) -> None:
+    def __init__(self, status: int = 200, body: Any = None, headers: dict[str, str] | None = None) -> None:
         self.status = status
         self._body = body
+        self.headers = headers or {}
 
     async def json(self, content_type: str | None = None) -> Any:
         return self._body
 
     async def read(self) -> bytes:
         return bytes(self._body)
+
+    async def text(self) -> str:
+        return self._body if isinstance(self._body, str) else ""
 
     async def __aenter__(self) -> "FakeResponse":
         return self

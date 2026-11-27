@@ -56,6 +56,23 @@ class InvalidApiKey(TransportNswError):
     """The API rejected the API key."""
 
 
+class RateLimited(TransportNswError):
+    """The API key is over its per-second rate limit or daily quota. The key itself is fine."""
+
+    def __init__(self, message: str, retry_after: float | None = None) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+def _retry_after(headers: Any) -> float | None:
+    """Seconds from a Retry-After header, or None when absent or not a positive number of seconds."""
+    try:
+        seconds = float(headers.get("Retry-After", ""))
+    except (TypeError, ValueError):
+        return None
+    return seconds if seconds > 0 else None
+
+
 @dataclass(frozen=True)
 class Stop:
     id: str
@@ -286,6 +303,24 @@ def parse_line_alerts(data: dict[str, Any]) -> list[LineAlert]:
     return alerts
 
 
+async def _raise_for_limits(response: aiohttp.ClientResponse) -> None:
+    """Raise RateLimited for the ways TfNSW says a key is over its limits.
+
+    Both the throttle (5/s) and the daily quota come back as 403, told apart from a rejected key only by the
+    X-Error-Detail header ("Account Over Rate Limit" / "Account Over Quota Limit"). Some requests over the limit
+    get a 503 saying so in the body instead, and 429 is handled in case a proxy in front answers with it.
+    """
+    status = response.status
+    if status == 429:
+        raise RateLimited("Rate limited (429)", _retry_after(response.headers))
+    if status == 403 and "limit" in response.headers.get("X-Error-Detail", "").lower():
+        raise RateLimited(f"Rate limited: {response.headers['X-Error-Detail']}", _retry_after(response.headers))
+    if status == 503:
+        body = (await response.text()).lower()
+        if "rate limit" in body or "quota" in body:
+            raise RateLimited("Rate limited (503)", _retry_after(response.headers))
+
+
 class TransportNswClient:
     def __init__(self, session: aiohttp.ClientSession, api_key: str) -> None:
         self._session = session
@@ -295,6 +330,7 @@ class TransportNswClient:
         headers = {**HEADERS, "Authorization": f"apikey {self._api_key}"}
         try:
             async with self._session.get(url, params=params, headers=headers, timeout=REQUEST_TIMEOUT) as response:
+                await _raise_for_limits(response)
                 if response.status in (401, 403):
                     raise InvalidApiKey(f"API key rejected ({response.status})")
                 if response.status != 200:
